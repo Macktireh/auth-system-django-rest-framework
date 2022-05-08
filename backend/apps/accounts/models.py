@@ -12,6 +12,8 @@ class UserAccount(AbstractUser):
         unique=True,
         help_text=_("Required to authenticate")
     )
+    first_name = models.CharField(_('first name'), blank=True, max_length=150)
+    last_name = models.CharField(_('last name'), blank=True, max_length=150)
     is_email_verified = models.BooleanField(
         _('email verified'), 
         default=False,
