@@ -1,1 +1,1 @@
-# Authentication System with Django and React
+# Authentication System with Django & React
