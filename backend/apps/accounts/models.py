@@ -12,6 +12,11 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
+    is_email_verified = models.BooleanField(
+        _('email verified'), 
+        default=False,
+        help_text=_("Specifies whether the user should verify their email address.")
+    )
     name = models.CharField(max_length=255)
     tc = models.BooleanField()
     created_at = models.DateTimeField(_('created date'), auto_now_add=True)
