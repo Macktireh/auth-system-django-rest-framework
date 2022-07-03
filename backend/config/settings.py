@@ -164,3 +164,6 @@ SIMPLE_JWT = {
 # the list of origins authorized to make HTTP requests
 CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', ["http://localhost:3080", "http://127.0.0.1:3000"])
 
+# Domain name frontend
+DOMAIN_FRONTEND = os.environ.get('DOMAIN_FRONTEND')
+
