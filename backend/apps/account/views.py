@@ -27,7 +27,7 @@ class UserSignupView(APIView):
             user = serializer.save()
             token = generate_token.make_token(user)
             subject = "Confirmer votre adresse email de votre compte Mackdin"
-            send_email_activation_account(get_current_site(request), user, token, subject, "accounts/activate.html")
+            send_email_activation_account(get_current_site(request), user, token, subject, "account/activate.html")
             return Response(
                 {'msg': "Inscription avec succès"},
                 status=status.HTTP_201_CREATED
@@ -48,7 +48,7 @@ def UserActivateAccountView(request, uidb64, token):
             user.is_email_verified = True
             user.save()
             subject = "Votre compte a été créé et activé avec succès !"
-            send_email_activation_account_success(get_current_site(request), user, subject, 'accounts/activate_success.html')
+            send_email_activation_account_success(get_current_site(request), user, subject, 'account/activate_success.html')
         return redirect('https://mack-twitter.pages.dev/account/signin')
     return redirect('https://mack-twitter.pages.dev/not-found/')
 

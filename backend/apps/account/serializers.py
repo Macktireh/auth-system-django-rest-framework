@@ -80,7 +80,7 @@ class SendEmailResetPasswordSerializer(serializers.Serializer):
             user = User.objects.get(email=email)
             token = PasswordResetTokenGenerator().make_token(user)
             subject = f"Réinitialisation du mot de passe sur {current_site}"
-            send_email_activation_account(settings.DOMAIN_FRONTEND, user, token, subject, 'accounts/send_email_reset_password.html')
+            send_email_activation_account(settings.DOMAIN_FRONTEND, user, token, subject, 'account/send_email_reset_password.html')
         else:
             raise serializers.ValidationError(
                 "L'adresse email n'exist pas !"
@@ -109,7 +109,7 @@ class UserResetPasswordSerializer(serializers.Serializer):
             user = None
         if user and PasswordResetTokenGenerator().check_token(user, token):
             subject = f"{settings.DOMAIN_FRONTEND} - Votre mot de passe a été modifié avec succès !"
-            send_email_activation_account_success(settings.DOMAIN_FRONTEND, user, subject, 'accounts/password_rest_success.html')
+            send_email_activation_account_success(settings.DOMAIN_FRONTEND, user, subject, 'account/password_rest_success.html')
             user.set_password(password)
             user.save()
         else:
