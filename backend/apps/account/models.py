@@ -8,7 +8,7 @@ from apps.account.managers import UserManager
 class User(AbstractUser):
     username = None
     email = models.EmailField(
-        _('email address'),
+        _('email'),
         max_length=255,
         unique=True,
         help_text=_("Required to authenticate")

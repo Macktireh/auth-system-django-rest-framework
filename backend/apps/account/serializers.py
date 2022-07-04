@@ -12,7 +12,9 @@ from apps.account.email import send_email_activation_account, send_email_activat
 User = get_user_model()
 
 class UserSignupSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(max_length=128, style={'input_type': 'password'})
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+    password2 = serializers.CharField(max_length=128, style={'input_type': 'password'}, write_only=True)
     class Meta:
         model = User
         fields = [
