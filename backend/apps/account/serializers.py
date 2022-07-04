@@ -6,32 +6,43 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 from rest_framework import serializers
 
-from .email import send_email_activation_account, send_email_activation_account_success
+from apps.account.email import send_email_activation_account, send_email_activation_account_success
 
 
 User = get_user_model()
 
 class UserSignupSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    password2 = serializers.CharField(max_length=128, style={'input_type': 'password'})
     class Meta:
         model = User
         fields = [
-            'email', 'name', 'tc', 'password', 'password2',
+            'email', 'first_name', 'last_name', 'password', 'password2',
         ]
         extra_kwargs = {
             'password': {'write_only': True},
         }
         
     def validate(self, attrs):
+        first_name = attrs.get('first_name')
+        last_name = attrs.get('last_name')
         password = attrs.get('password')
         password2 = attrs.get('password2')
-        if password != password2:
+        if not first_name:
+            raise serializers.ValidationError(
+                "Le prénom ne doit pas être null"
+            )
+        if not last_name:
+            raise serializers.ValidationError(
+                "Le nom ne doit pas être null"
+            )
+        if password and password2 and password != password2:
             raise serializers.ValidationError(
                 "Le mot de passe et le mot de passe de confirmation ne correspondent pas."
             )
         return attrs
     
     def create(self, validate_data):
+        validate_data.pop('password2', None)
         return User.objects.create_user(**validate_data)
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -46,13 +57,13 @@ class UserProfilSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'email', 'name',
+            'id', 'email', 'first_name', 'last_name',
         ]
 
 
 class UserChangePasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
-    password2 = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
+    password = serializers.CharField(max_length=128, style={'input_type': 'password'}, write_only=True)
+    password2 = serializers.CharField(max_length=128, style={'input_type': 'password'}, write_only=True)
     class Meta:
         fields = ['password', 'password2']
 
@@ -88,8 +99,8 @@ class SendEmailResetPasswordSerializer(serializers.Serializer):
         return attrs
 
 class UserResetPasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
-    password2 = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
+    password = serializers.CharField(max_length=128, style={'input_type': 'password'}, write_only=True)
+    password2 = serializers.CharField(max_length=128, style={'input_type': 'password'}, write_only=True)
     class Meta:
         fields = ['password', 'password2']
         

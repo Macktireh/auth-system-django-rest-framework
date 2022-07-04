@@ -9,10 +9,10 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from .renderers import UserRenderer
-from .tokens import get_tokens_for_user, generate_token
-from .email import send_email_activation_account, send_email_activation_account_success
-from . import serializers
+from apps.account.renderers import UserRenderer
+from apps.account.tokens import get_tokens_for_user, generate_token
+from apps.account.email import send_email_activation_account, send_email_activation_account_success
+from apps.account import serializers
 
 
 User = get_user_model()
