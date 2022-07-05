@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.account.renderers import UserRenderer
 from apps.account.tokens import get_tokens_for_user, generate_token
-from apps.account.email import send_email_activation_account, send_email_activation_account_success
+from apps.account.email import send_email_to_user
 from apps.account import serializers
 
 
@@ -26,8 +26,13 @@ class UserSignupView(APIView):
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             token = generate_token.make_token(user)
-            subject = "Confirmer votre adresse email de votre compte Mackdin"
-            send_email_activation_account(get_current_site(request), user, token, subject, "account/activate.html")
+            send_email_to_user(
+                subject="Confirmer votre adresse email de votre compte Mackdin", 
+                template_name="account/activate.html", 
+                user=user, 
+                token=token, 
+                domain=get_current_site(request)
+            )
             return Response(
                 {'msg': "Inscription avec succès"},
                 status=status.HTTP_201_CREATED
@@ -37,7 +42,7 @@ class UserSignupView(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-def UserActivateAccountView(request, uidb64, token):
+def user_activate_account_view(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -47,8 +52,12 @@ def UserActivateAccountView(request, uidb64, token):
         if not user.is_email_verified:
             user.is_email_verified = True
             user.save()
-            subject = "Votre compte a été créé et activé avec succès !"
-            send_email_activation_account_success(get_current_site(request), user, subject, 'account/activate_success.html')
+            send_email_to_user(
+                subject="Votre compte a été créé et activé avec succès !", 
+                template_name='account/activate_success.html', 
+                user=user, 
+                domain=get_current_site(request)
+            )
         return redirect('https://mack-twitter.pages.dev/account/signin')
     return redirect('https://mack-twitter.pages.dev/not-found/')
 

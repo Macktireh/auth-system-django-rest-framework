@@ -5,27 +5,22 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 
 
-def send_email_activation_account(current_site, user, token, subject, template_name):
-    email_body_activate = render_to_string(template_name, {
-            'user': user,
-            'domain': current_site,
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            'token': token
-        }
-    )
+def send_email_to_user(subject, template_name, user, token=None, domain=None):
+    app, ext = template_name.split('/')[0], template_name.split('.')[-1]
+    if ext == 'html' and app in [app.split('.')[-1] for app in settings.LOCAL_APPS]:
+        body = render_to_string(
+            template_name, {
+                'user': user,
+                'domain': domain or None,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)) or None,
+                'token': token or None
+            }
+        )
+    else:
+        body = template_name
     email = EmailMessage(
         subject=subject,
-        body=email_body_activate,
-        from_email=settings.EMAIL_HOST_USER,
-        to=[user.email]
-    )
-    email.send()
-
-def send_email_activation_account_success(current_site, user, subject, template_name):
-    email_body_activate_success = render_to_string(template_name, {'domain': current_site,})
-    email = EmailMessage(
-        subject=subject,
-        body=email_body_activate_success,
+        body=body,
         from_email=settings.EMAIL_HOST_USER,
         to=[user.email]
     )
