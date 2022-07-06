@@ -3,6 +3,8 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.template.exceptions import TemplateDoesNotExist
+from django.utils.translation import gettext_lazy as _
 
 
 def send_email_to_user(subject, template_name, user, token=None, domain=None):
@@ -16,6 +18,8 @@ def send_email_to_user(subject, template_name, user, token=None, domain=None):
                 'token': token or None
             }
         )
+    elif ext == 'html' and app not in [app.split('.')[-1] for app in settings.LOCAL_APPS]:
+        raise TemplateDoesNotExist(_('Your template does not exist'))
     else:
         body = template_name
     email = EmailMessage(

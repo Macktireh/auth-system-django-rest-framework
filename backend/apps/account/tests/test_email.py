@@ -67,7 +67,6 @@ https://example.com
         self.assertEqual(len(mail.outbox), 1)
         email_message = mail.outbox[0]
         self.assertEqual(email_message.subject, self.content_with_body_file_html['subject'])
-        # self.assertTemplateUsed(email_message.body, self.content_with_body_file_html['body'])
         self.assertEqual(email_message.body, self.template_content)
         self.assertEqual(email_message.from_email, self.content_with_body_file_html['from_email'])
         self.assertEqual(email_message.to, self.content_with_body_file_html['to'])
@@ -77,6 +76,16 @@ https://example.com
             send_email_to_user(
                 subject=self.content_with_body_file_html['subject'],
                 template_name='account/test.html',
+                user=self.user,
+                token=self.content_with_body_file_html['token'],
+                domain=self.content_with_body_file_html['domain']
+            )
+
+    def test_send_email_to_user_body_is_app_not_exist(self):
+        with self.assertRaises(TemplateDoesNotExist):
+            send_email_to_user(
+                subject=self.content_with_body_file_html['subject'],
+                template_name='accounts/activate.html',
                 user=self.user,
                 token=self.content_with_body_file_html['token'],
                 domain=self.content_with_body_file_html['domain']
