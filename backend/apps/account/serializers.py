@@ -6,13 +6,15 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 from rest_framework import serializers
 
-from apps.account.email import send_email_activation_account, send_email_activation_account_success
+from apps.account.email import send_email_to_user
 
 
 User = get_user_model()
 
 class UserSignupSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(max_length=128, style={'input_type': 'password'})
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+    password2 = serializers.CharField(max_length=128, style={'input_type': 'password'}, write_only=True)
     class Meta:
         model = User
         fields = [
@@ -90,8 +92,13 @@ class SendEmailResetPasswordSerializer(serializers.Serializer):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             token = PasswordResetTokenGenerator().make_token(user)
-            subject = f"Réinitialisation du mot de passe sur {current_site}"
-            send_email_activation_account(settings.DOMAIN_FRONTEND, user, token, subject, 'account/send_email_reset_password.html')
+            send_email_to_user(
+                subject=f"Réinitialisation du mot de passe sur {current_site}",
+                template_name='account/send_email_reset_password.html',
+                user=user,
+                token=token,
+                domain=settings.DOMAIN_FRONTEND
+            )
         else:
             raise serializers.ValidationError(
                 "L'adresse email n'exist pas !"
@@ -119,10 +126,14 @@ class UserResetPasswordSerializer(serializers.Serializer):
         except Exception as e:
             user = None
         if user and PasswordResetTokenGenerator().check_token(user, token):
-            subject = f"{settings.DOMAIN_FRONTEND} - Votre mot de passe a été modifié avec succès !"
-            send_email_activation_account_success(settings.DOMAIN_FRONTEND, user, subject, 'account/password_rest_success.html')
             user.set_password(password)
             user.save()
+            send_email_to_user(
+                subject=f"{settings.DOMAIN_FRONTEND} - Votre mot de passe a été modifié avec succès !", 
+                template_name='account/password_rest_success.html', 
+                user=user, 
+                domain=settings.DOMAIN_FRONTEND
+            )
         else:
             raise serializers.ValidationError(
                 "Votre demande de réinitialisation du mot de passe est expirer"
