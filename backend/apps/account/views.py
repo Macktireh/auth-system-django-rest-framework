@@ -122,7 +122,7 @@ class UserChangePasswordView(APIView):
 class SendEmailResetPasswordView(APIView):
     renderer_classes = [UserRenderer]
     def post(self, request, format=None):
-        serializer = serializers.SendEmailResetPasswordSerializer(data=request.data)
+        serializer = serializers.SendEmailResetPasswordSerializer(data=request.data, context={'current_site': get_current_site(request)})
         if serializer.is_valid(raise_exception=True):
             return Response(
                 {'msg': "Le lien de réinitialisation du mot de passe a été envoyé. Veuillez vérifier votre email"},

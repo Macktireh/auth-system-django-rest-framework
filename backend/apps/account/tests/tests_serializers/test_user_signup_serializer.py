@@ -185,7 +185,3 @@ class UserSignupSerializerTests(TestCase):
         self.assertEqual(new_user.first_name, 'Zecha')
         self.assertEqual(new_user.last_name, 'ZZ')
         self.assertEqual(new_user.email, 'zecha@gmail.com')
-
-        # print(self.serializer_data)
-        # print(serializer.errors)
-        # print()

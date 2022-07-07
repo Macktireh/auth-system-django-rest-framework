@@ -1,5 +1,7 @@
 import six
+
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
